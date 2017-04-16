@@ -38,6 +38,8 @@ size_t min(size_t lhs, size_t rhs);
 
 void print_tab(matrix<size_t> const& mat);
 
+void print_sbs(std::vector<std::string> const& input1, std::vector<std::string> const& input2);
+
 template<typename... T>
 size_t min(size_t lhs, size_t rhs, T... values) {
 	return (lhs < rhs) ? min(lhs, values...) : min(rhs, values...);

@@ -47,9 +47,10 @@ int main(int argc, char const* argv[]) {
 	std::cout << yp << std::endl;
 
 	if(argc != 3) {
-		std::cout
-		        << "To activate the line by line padding, pass two files as command-line arguments"
-		        << std::endl;
+		std::cout << std::endl
+		          << "*** To activate the line by line padding, pass two files as command-line "
+		             "arguments ***"
+		          << std::endl;
 		return 0;
 	}
 
@@ -76,8 +77,5 @@ int main(int argc, char const* argv[]) {
 
 	std::cout << "Total cost: " << cost << std::endl;
 
-	for(size_t i = 0, count = padded_lines1.size(); i < count; ++i) {
-		std::cout << "1: " << padded_lines1[i] << std::endl;
-		std::cout << "2: " << padded_lines2[i] << std::endl;
-	}
+	print_sbs(padded_lines1, padded_lines2);
 }
