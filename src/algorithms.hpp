@@ -4,6 +4,7 @@
 #include <limits>
 #include <list>
 #include <string>
+#include <tuple>
 #include <vector>
 
 template<typename T>
@@ -107,40 +108,59 @@ std::list<Modification<typename Container::value_type>> backtrack(matrix<size_t>
 }
 
 template<typename Strategy, typename Container>
-void make_padded(std::list<Modification<typename Container::value_type>> mods,
-                 Container& input1,
-                 Container& input2) {
+std::pair<Container, Container> make_padded(
+        std::list<Modification<typename Container::value_type>> mods,
+        Container const& input1,
+        Container const& input2) {
 
 	using Mod = Modification<typename Container::value_type>;
+
+	Container res1, res2;
 
 	size_t pos1 = 0, pos2 = 0;
 
 	for(auto mod : mods) {
-		// re-obtain the begin iterator because of iterator invalidation induced by the "insert"
-		// method
-		auto begin1 = input1.begin(), begin2 = input2.begin();
-
 		if(mod.type == Mod::ADD) {
-			input1.insert(begin1 + pos1, Strategy::empty_value());
+			res1.push_back(Strategy::empty_value());
+			res2.push_back(input2[pos2]);
 
+			++pos2;
 		} else if(mod.type == Mod::DEL) {
-			input2.insert(begin2 + pos2, Strategy::empty_value());
+			res1.push_back(input1[pos1]);
+			res2.push_back(Strategy::empty_value());
 
+			++pos1;
 		} else {
 			// Substitution
-			Strategy::modify_subelements(*(begin1 + pos1), *(begin2 + pos2));
-		}
+			auto sub_element1 = input1[pos1], sub_element2 = input2[pos2];
 
-		++pos1;
-		++pos2;
+			Strategy::modify_subelements(sub_element1, sub_element2);
+
+			res1.push_back(sub_element1);
+			res2.push_back(sub_element2);
+
+			++pos2;
+			++pos1;
+		}
 	}
+
+	return {res1, res2};
+}
+
+
+template<typename Strategy, typename Container>
+std::tuple<size_t, Container, Container> do_the_thing(Container& input1, Container& input2, matrix<size_t> tab) {
+	auto mods     = backtrack<Strategy>(tab, input1, input2);
+	auto last_col = tab[tab.size() - 1];
+
+	Container res1, res2;
+	std::tie(res1, res2) = make_padded<Strategy>(mods, input1, input2);
+
+	return {last_col[last_col.size() - 1], res1, res2};
 }
 
 template<typename Strategy, typename Container>
-size_t do_the_thing(Container& input1, Container& input2) {
+std::tuple<size_t, Container, Container> do_the_thing(Container& input1, Container& input2) {
 	auto tab      = fill_tab<Strategy>(input1, input2);
-	auto mods     = backtrack<Strategy>(tab, input1, input2);
-	auto last_col = tab[tab.size() - 1];
-	make_padded<Strategy>(mods, input1, input2);
-	return last_col[last_col.size() - 1];
+	return do_the_thing<Strategy>(input1, input2, tab);
 }

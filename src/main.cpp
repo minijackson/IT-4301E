@@ -57,21 +57,22 @@ int main(int argc, char const* argv[]) {
 	std::ifstream input_stream1((argv[1])), input_stream2((argv[2]));
 	std::vector<std::string> lines1, lines2;
 
-	for(std::string line;
-	    std::getline(input_stream1, line);) {
+	for(std::string line; std::getline(input_stream1, line);) {
 		lines1.push_back(line);
 	}
 
-	for(std::string line;
-	    std::getline(input_stream2, line);) {
+	for(std::string line; std::getline(input_stream2, line);) {
 		lines2.push_back(line);
 	}
 
-	std::cout << "Total cost: " << do_the_thing<LineStrategy>(lines1, lines2) << std::endl;
+	size_t cost;
+	std::vector<std::string> padded_lines1, padded_lines2;
+	std::tie(cost, padded_lines1, padded_lines2) = do_the_thing<LineStrategy>(lines1, lines2);
 
-	for(size_t i = 0, count = lines1.size(); i < count; ++i) {
-		std::cout << "1: " << lines1[i] << std::endl;
-		std::cout << "2: " << lines2[i] << std::endl;
+	std::cout << "Total cost: " << cost << std::endl;
+
+	for(size_t i = 0, count = padded_lines1.size(); i < count; ++i) {
+		std::cout << "1: " << padded_lines1[i] << std::endl;
+		std::cout << "2: " << padded_lines2[i] << std::endl;
 	}
-	
 }
