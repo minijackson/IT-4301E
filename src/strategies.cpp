@@ -42,7 +42,7 @@ size_t LineStrategy::sub(std::string const& input1, std::string const& input2) {
 }
 
 void LineStrategy::modify_subelements(std::string& input1, std::string& input2) {
-	do_the_thing<CharacterStrategy>(input1, input2, get_score_tab(input1, input2));
+	std::tie(std::ignore, input1, input2) = do_the_thing<CharacterStrategy>(input1, input2, get_score_tab(input1, input2));
 }
 
 LineStrategy::ScoreTab& LineStrategy::get_score_tab(std::string const& input1,

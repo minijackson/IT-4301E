@@ -27,8 +27,12 @@ int main(int argc, char const* argv[]) {
 	        << std::endl;
 
 	auto mods = backtrack<CharacterStrategy>(res, x, y);
-	for(auto mod : mods) {
-		mod.print();
+
+	{
+		auto i = x.begin(), j = y.begin();
+		for(auto mod : mods) {
+			mod.print(i, j);
+		}
 	}
 
 	std::cout
@@ -37,9 +41,10 @@ int main(int argc, char const* argv[]) {
 	           "================================================================================"
 	        << std::endl;
 
-	make_padded<CharacterStrategy>(mods, x, y);
-	std::cout << x << std::endl;
-	std::cout << y << std::endl;
+	std::string xp, yp;
+	std::tie(xp, yp) = make_padded<CharacterStrategy>(mods, x, y);
+	std::cout << xp << std::endl;
+	std::cout << yp << std::endl;
 
 	if(argc != 3) {
 		std::cout

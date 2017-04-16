@@ -10,21 +10,24 @@
 template<typename T>
 using matrix = std::vector<std::vector<T>>;
 
-template<typename value_type>
+template<typename Container>
 struct Modification {
 	enum { ADD, DEL, SUB } type;
-	value_type const &lhs, &rhs;
 
-	void print() {
+	void print(typename Container::iterator& i, typename Container::iterator& j) {
 		switch(type) {
 			case ADD:
-				std::cout << "Add '" << lhs << "'";
+				std::cout << "Add '" << *j << "'";
+				++j;
 				break;
 			case DEL:
-				std::cout << "Del '" << lhs << "'";
+				std::cout << "Del '" << *i << "'";
+				++i;
 				break;
 			case SUB:
-				std::cout << "Substitute '" << lhs << "' by '" << rhs << "'";
+				std::cout << "Substitute '" << *i << "' by '" << *j << "'";
+				++i;
+				++j;
 				break;
 		}
 		std::cout << std::endl;
@@ -67,10 +70,10 @@ matrix<size_t> fill_tab(Container const& input1, Container const& input2) {
 }
 
 template<typename Strategy, typename Container>
-std::list<Modification<typename Container::value_type>> backtrack(matrix<size_t> const& mat,
+std::list<Modification<Container>> backtrack(matrix<size_t> const& mat,
                                                                   Container& input1,
                                                                   Container& input2) {
-	using Mod = Modification<typename Container::value_type>;
+	using Mod = Modification<Container>;
 	std::list<Mod> res;
 
 	std::pair<size_t, size_t> position{mat.size() - 1, mat[0].size() - 1};
@@ -92,14 +95,14 @@ std::list<Modification<typename Container::value_type>> backtrack(matrix<size_t>
 		       minimum = min(cost_add, cost_sub, cost_del);
 
 		if(minimum == cost_add) {
-			res.push_front(Mod{Mod::ADD, input2[position.second - 1], Strategy::empty_value()});
+			res.push_front(Mod{Mod::ADD});
 			--position.second;
 		} else if(minimum == cost_sub) {
-			res.push_front(Mod{Mod::SUB, input1[position.first - 1], input2[position.second - 1]});
+			res.push_front(Mod{Mod::SUB});
 			--position.first;
 			--position.second;
 		} else {
-			res.push_front(Mod{Mod::DEL, input1[position.first - 1], Strategy::empty_value()});
+			res.push_front(Mod{Mod::DEL});
 			--position.first;
 		}
 	}
@@ -109,11 +112,11 @@ std::list<Modification<typename Container::value_type>> backtrack(matrix<size_t>
 
 template<typename Strategy, typename Container>
 std::pair<Container, Container> make_padded(
-        std::list<Modification<typename Container::value_type>> mods,
+        std::list<Modification<Container>> mods,
         Container const& input1,
         Container const& input2) {
 
-	using Mod = Modification<typename Container::value_type>;
+	using Mod = Modification<Container>;
 
 	Container res1, res2;
 
